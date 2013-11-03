@@ -410,10 +410,6 @@ int Volume::mountVol() {
         errno = 0;
         int gid;
 
-        // Originally, non-primary storage was set to MEDIA_RW group which
-        // prevented users from writing to it. We don't want that.
-        gid = AID_SDCARD_RW;
-
         if (isFatFs) {
             if (Fat::doMount(devicePath, getMountpoint(), false, false, false,
                     AID_MEDIA_RW, AID_MEDIA_RW, 0007, true)) {
@@ -421,8 +417,8 @@ int Volume::mountVol() {
                 continue;
             }
         } else {
-            if (Ntfs::doMount(devicePath, "/mnt/secure/staging", false, false, false,
-                    AID_SYSTEM, gid, 0702, true)) {
+            if (Ntfs::doMount(devicePath, getMountpoint(), false, false, false,
+                    AID_MEDIA_RW, AID_MEDIA_RW, 0007, true)) {
                 SLOGE("%s failed to mount via NTFS (%s)\n", devicePath, strerror(errno));
                 continue;
             }
